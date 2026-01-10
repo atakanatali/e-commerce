@@ -4,11 +4,11 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce.Shared", "src/ECommerce.Shared/ECommerce.Shared.csproj", "{8D7EE85E-4F28-4C90-955B-8F1D4B12E3EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService", "src/OrderService/OrderService.csproj", "{A9B2D02C-6F2F-4B4F-8F5D-4B5EA10A1D5E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Api", "src/Order.Api/Order.Api.csproj", "{A9B2D02C-6F2F-4B4F-8F5D-4B5EA10A1D5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockService", "src/StockService/StockService.csproj", "{B5F3E7A3-3451-4EBE-9F62-2E8A7B9CC0C9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stock.Api", "src/Stock.Api/Stock.Api.csproj", "{B5F3E7A3-3451-4EBE-9F62-2E8A7B9CC0C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService", "src/NotificationService/NotificationService.csproj", "{4B7C2A87-6D5F-4C0F-9A60-4E6EFED25E3C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notification.Api", "src/Notification.Api/Notification.Api.csproj", "{4B7C2A87-6D5F-4C0F-9A60-4E6EFED25E3C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

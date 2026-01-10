@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <RestoreOnBuild>true</RestoreOnBuild>
+  </PropertyGroup>
+</Project>
