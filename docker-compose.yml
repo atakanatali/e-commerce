@@ -21,7 +21,7 @@ services:
   order-service:
     build:
       context: .
-      dockerfile: src/OrderService/Dockerfile
+      dockerfile: src/Order.Api/Dockerfile
     environment:
       ConnectionStrings__Default: Host=postgres;Database=orderdb;Username=ecommerce;Password=ecommerce
       RabbitMQ__Host: rabbitmq
@@ -37,7 +37,7 @@ services:
   stock-service:
     build:
       context: .
-      dockerfile: src/StockService/Dockerfile
+      dockerfile: src/Stock.Api/Dockerfile
     environment:
       ConnectionStrings__Default: Host=postgres;Database=stockdb;Username=ecommerce;Password=ecommerce
       RabbitMQ__Host: rabbitmq
@@ -51,7 +51,7 @@ services:
   notification-service:
     build:
       context: .
-      dockerfile: src/NotificationService/Dockerfile
+      dockerfile: src/Notification.Api/Dockerfile
     environment:
       ConnectionStrings__Default: Host=postgres;Database=notificationdb;Username=ecommerce;Password=ecommerce
       RabbitMQ__Host: rabbitmq
