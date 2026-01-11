@@ -1,5 +1,3 @@
-namespace ECommerce.Messaging.RabbitMq;
-
 using ECommerce.Shared.Messaging;
 
 namespace ECommerce.Messaging.RabbitMq;
