@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Notification.Worker.Domain;
-using Notification.Worker.Infrastructure.Inbox;
-using Notification.Worker.Infrastructure.Outbox;
 
 namespace Notification.Worker.Infrastructure.Persistence;
 

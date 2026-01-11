@@ -1,5 +1,7 @@
+using ECommerce.Messaging.RabbitMq;
 using Microsoft.EntityFrameworkCore;
 using Notification.Worker.Application;
+using Notification.Worker.Application.Abstractions;
 using Notification.Worker.Infrastructure.Consumers;
 using Notification.Worker.Infrastructure.Messaging;
 using Notification.Worker.Infrastructure.Outbox;
@@ -22,11 +24,11 @@ public static class Program
 
         builder.Services.AddDbContext<NotificationDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+        builder.Services.AddScoped<INotificationLogRepository, NotificationLogRepository>();
+        builder.Services.AddScoped<INotificationService, NotificationService>();
 
-        builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMQ"));
-        builder.Services.AddSingleton<IRabbitMqConnectionFactory, RabbitMqConnectionFactory>();
+        builder.Services.AddMessageBroker(builder.Configuration);
         builder.Services.AddSingleton<ITopologyInitializer, NotificationTopologyInitializer>();
-        builder.Services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
 
         builder.Services.AddScoped<OrderConfirmedEventHandler>();
 

@@ -1,5 +1,7 @@
+using ECommerce.Messaging.RabbitMq;
 using Microsoft.EntityFrameworkCore;
 using Stock.Worker.Application;
+using Stock.Worker.Application.Abstractions;
 using Stock.Worker.Infrastructure.Consumers;
 using Stock.Worker.Infrastructure.Messaging;
 using Stock.Worker.Infrastructure.Outbox;
@@ -22,11 +24,11 @@ public static class Program
 
         builder.Services.AddDbContext<StockDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+        builder.Services.AddScoped<IStockRepository, StockRepository>();
+        builder.Services.AddScoped<IStockReservationService, StockReservationService>();
 
-        builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMQ"));
-        builder.Services.AddSingleton<IRabbitMqConnectionFactory, RabbitMqConnectionFactory>();
+        builder.Services.AddMessageBroker(builder.Configuration);
         builder.Services.AddSingleton<ITopologyInitializer, StockTopologyInitializer>();
-        builder.Services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
 
         builder.Services.AddScoped<OrderCreatedEventHandler>();
 
