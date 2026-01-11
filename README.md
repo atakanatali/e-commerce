@@ -15,12 +15,12 @@ This repository contains a .NET 8 microservices sample that models a simple e-co
 The system is composed of three HTTP API services. They exchange events over RabbitMQ and keep separate PostgreSQL data stores.
 
 Flow summary:
-1. **Order.Api** creates orders and publishes stock reservation requests.
+1. **Orchestrator.Api** creates orders and publishes stock reservation requests.
 2. **Stock.Api** processes reservations and publishes the outcome.
 3. **Notification.Api** records notifications when orders are confirmed.
 
 ## Projects
-- **Order.Api**: Order creation and reservation result handling. Port: `5001` (docker).
+- **Orchestrator.Api**: Order creation and reservation result handling. Port: `5001` (docker).
 - **Stock.Api**: Stock reservation processing.
 - **Notification.Api**: Order confirmation notifications.
 - **ECommerce.Shared**: Shared models/contracts and helpers.
@@ -39,7 +39,7 @@ docker compose up --build
 
 Default endpoints:
 - RabbitMQ management UI: `http://localhost:15672` (user: `guest`, password: `guest`)
-- Order.Api: `http://localhost:5001`
+- Orchestrator.Api: `http://localhost:5001`
 
 > The other services do not expose host ports; they communicate over the Docker network.
 
@@ -51,7 +51,7 @@ dotnet restore
 ```
 
 ```bash
-dotnet run --project src/Order.Api/Order.Api.csproj
+dotnet run --project src/Orchestrator.Api/Orchestrator.Api.csproj
 ```
 
 ```bash
@@ -80,7 +80,7 @@ The root `Directory.Build.props` enables **restore on build** so Rider's **Rebui
 │   └── init.sql
 └── src/
     ├── ECommerce.Shared/
-    ├── Order.Api/
+    ├── Orchestrator.Api/
     ├── Stock.Api/
     └── Notification.Api/
 ```

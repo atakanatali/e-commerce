@@ -21,7 +21,7 @@ services:
   order-service:
     build:
       context: .
-      dockerfile: src/Order.Api/Dockerfile
+      dockerfile: src/Orchestrator.Api/Dockerfile
     environment:
       ConnectionStrings__Default: Host=postgres;Database=orderdb;Username=ecommerce;Password=ecommerce
       RabbitMQ__Host: rabbitmq
