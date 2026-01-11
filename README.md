@@ -16,13 +16,13 @@ The system is composed of three HTTP API services. They exchange events over Rab
 
 Flow summary:
 1. **Orchestrator.Api** creates orders and publishes stock reservation requests.
-2. **Stock.Api** processes reservations and publishes the outcome.
-3. **Notification.Api** records notifications when orders are confirmed.
+2. **Stock.Worker** processes reservations and publishes the outcome.
+3. **Notification.Worker** records notifications when orders are confirmed.
 
 ## Projects
 - **Orchestrator.Api**: Order creation and reservation result handling. Port: `5001` (docker).
-- **Stock.Api**: Stock reservation processing.
-- **Notification.Api**: Order confirmation notifications.
+- **Stock.Worker**: Stock reservation processing.
+- **Notification.Worker**: Order confirmation notifications.
 - **ECommerce.Shared**: Shared models/contracts and helpers.
 
 ## Prerequisites
@@ -55,11 +55,11 @@ dotnet run --project src/Orchestrator.Api/Orchestrator.Api.csproj
 ```
 
 ```bash
-dotnet run --project src/Stock.Api/Stock.Api.csproj
+dotnet run --project src/Stock.Worker/Stock.Worker.csproj
 ```
 
 ```bash
-dotnet run --project src/Notification.Api/Notification.Api.csproj
+dotnet run --project src/Notification.Worker/Notification.Worker.csproj
 ```
 
 When running locally, use the following host values for infrastructure:
@@ -81,8 +81,8 @@ The root `Directory.Build.props` enables **restore on build** so Rider's **Rebui
 └── src/
     ├── ECommerce.Shared/
     ├── Orchestrator.Api/
-    ├── Stock.Api/
-    └── Notification.Api/
+    ├── Stock.Worker/
+    └── Notification.Worker/
 ```
 
 ## License
