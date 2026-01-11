@@ -1,8 +1,8 @@
 using System.Text.Json;
 using ECommerce.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
+using ECommerce.Messaging.RabbitMq;
 using Microsoft.Extensions.Options;
-using Stock.Worker.Infrastructure.Messaging;
 using Stock.Worker.Infrastructure.Persistence;
 
 namespace Stock.Worker.Infrastructure.Outbox;

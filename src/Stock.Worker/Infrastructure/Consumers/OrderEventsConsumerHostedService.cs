@@ -2,12 +2,12 @@ using System.Text.Json;
 using ECommerce.Shared.Contracts.Events;
 using ECommerce.Shared.Messaging;
 using ECommerce.Shared.Messaging.Topology;
+using ECommerce.Messaging.RabbitMq;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Stock.Worker.Application;
-using Stock.Worker.Infrastructure.Inbox;
-using Stock.Worker.Infrastructure.Messaging;
+using Stock.Worker.Domain;
 using Stock.Worker.Infrastructure.Persistence;
 
 namespace Stock.Worker.Infrastructure.Consumers;

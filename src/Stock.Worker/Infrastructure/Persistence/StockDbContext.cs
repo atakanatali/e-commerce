@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Stock.Worker.Domain;
-using Stock.Worker.Infrastructure.Inbox;
-using Stock.Worker.Infrastructure.Outbox;
 
 namespace Stock.Worker.Infrastructure.Persistence;
 

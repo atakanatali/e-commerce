@@ -4,6 +4,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce.Shared", "src/ECommerce.Shared/ECommerce.Shared.csproj", "{8D7EE85E-4F28-4C90-955B-8F1D4B12E3EA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ECommerce.Messaging.RabbitMq", "src/ECommerce.Messaging.RabbitMq/ECommerce.Messaging.RabbitMq.csproj", "{C5F2B9E8-9D38-4C49-8F12-2A9C7B9B4417}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orchestrator.Api", "src/Orchestrator.Api/Orchestrator.Api.csproj", "{A9B2D02C-6F2F-4B4F-8F5D-4B5EA10A1D5E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stock.Worker", "src/Stock.Worker/Stock.Worker.csproj", "{B5F3E7A3-3451-4EBE-9F62-2E8A7B9CC0C9}"
@@ -20,6 +22,10 @@ Global
 		{8D7EE85E-4F28-4C90-955B-8F1D4B12E3EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D7EE85E-4F28-4C90-955B-8F1D4B12E3EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D7EE85E-4F28-4C90-955B-8F1D4B12E3EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5F2B9E8-9D38-4C49-8F12-2A9C7B9B4417}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5F2B9E8-9D38-4C49-8F12-2A9C7B9B4417}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5F2B9E8-9D38-4C49-8F12-2A9C7B9B4417}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5F2B9E8-9D38-4C49-8F12-2A9C7B9B4417}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A9B2D02C-6F2F-4B4F-8F5D-4B5EA10A1D5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A9B2D02C-6F2F-4B4F-8F5D-4B5EA10A1D5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A9B2D02C-6F2F-4B4F-8F5D-4B5EA10A1D5E}.Release|Any CPU.ActiveCfg = Release|Any CPU

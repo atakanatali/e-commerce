@@ -1,4 +1,5 @@
 using ECommerce.Shared.Messaging.Topology;
+using ECommerce.Messaging.RabbitMq;
 using RabbitMQ.Client;
 
 namespace Orchestrator.Api.Infrastructure.Messaging;

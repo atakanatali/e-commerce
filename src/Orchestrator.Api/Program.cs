@@ -1,6 +1,9 @@
+using ECommerce.Messaging.RabbitMq;
 using ECommerce.Shared.Messaging.Topology;
 using Microsoft.EntityFrameworkCore;
 using Orchestrator.Api.Application;
+using Orchestrator.Api.Application.Abstractions;
+using Orchestrator.Api.Application.Orders;
 using Orchestrator.Api.Infrastructure.Consumers;
 using Orchestrator.Api.Infrastructure.Messaging;
 using Orchestrator.Api.Infrastructure.Outbox;
@@ -24,11 +27,14 @@ public static class Program
         builder.Services.AddControllers();
         builder.Services.AddDbContext<OrderDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+        builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+        builder.Services.AddScoped<IOutboxRepository, OutboxRepository>();
+        builder.Services.AddScoped<IOrderUnitOfWork, OrderUnitOfWork>();
+        builder.Services.AddScoped<IOrderService, OrderService>();
+        builder.Services.AddScoped<IOrderWorkflowService, OrderWorkflowService>();
 
-        builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMQ"));
-        builder.Services.AddSingleton<IRabbitMqConnectionFactory, RabbitMqConnectionFactory>();
+        builder.Services.AddMessageBroker(builder.Configuration);
         builder.Services.AddSingleton<ITopologyInitializer, OrderTopologyInitializer>();
-        builder.Services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
 
         builder.Services.AddScoped<StockReservedEventHandler>();
         builder.Services.AddScoped<StockReservationFailedEventHandler>();

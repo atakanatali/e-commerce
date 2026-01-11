@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Orchestrator.Api.Domain;
-using Orchestrator.Api.Infrastructure.Inbox;
-using Orchestrator.Api.Infrastructure.Outbox;
 
 namespace Orchestrator.Api.Infrastructure.Persistence;
 
