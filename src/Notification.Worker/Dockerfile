@@ -1,9 +1,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ECommerce.sln ./
+COPY src/ECommerce.Messaging.RabbitMq/ECommerce.Messaging.RabbitMq.csproj src/ECommerce.Messaging.RabbitMq/
 COPY src/ECommerce.Shared/ECommerce.Shared.csproj src/ECommerce.Shared/
 COPY src/Notification.Worker/Notification.Worker.csproj src/Notification.Worker/
 RUN dotnet restore src/Notification.Worker/Notification.Worker.csproj
+COPY src/ECommerce.Messaging.RabbitMq src/ECommerce.Messaging.RabbitMq
 COPY src/ECommerce.Shared src/ECommerce.Shared
 COPY src/Notification.Worker src/Notification.Worker
 RUN dotnet publish src/Notification.Worker/Notification.Worker.csproj -c Release -o /app/publish
