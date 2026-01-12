@@ -1,4 +1,5 @@
 using ECommerce.Messaging.RabbitMq;
+using ECommerce.Shared.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Notification.Worker.Application;
 using Notification.Worker.Application.Abstractions;
@@ -23,7 +24,16 @@ public static class Program
         var builder = Host.CreateApplicationBuilder(args);
 
         builder.Services.AddDbContext<NotificationDbContext>(options =>
-            options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+            options.UseNpgsql(
+                builder.Configuration.GetConnectionString("Default"),
+                npgsqlOptions =>
+                {
+                    npgsqlOptions.MigrationsAssembly(typeof(Program).Assembly.FullName);
+                    npgsqlOptions.MigrationsHistoryTable(
+                        "__EFMigrationsHistory_Notification",
+                        schema: null);
+                    npgsqlOptions.EnableRetryOnFailure();
+                }));
         builder.Services.AddScoped<INotificationLogRepository, NotificationLogRepository>();
         builder.Services.AddScoped<INotificationService, NotificationService>();
 
@@ -36,6 +46,11 @@ public static class Program
         builder.Services.AddHostedService<OrderConfirmedConsumerHostedService>();
 
         var host = builder.Build();
+
+        var logger = host.Services.GetRequiredService<ILogger<Program>>();
+        MigrationExtensions.ApplyMigrationsWithRetryAsync<NotificationDbContext>(host.Services, logger)
+            .GetAwaiter()
+            .GetResult();
 
         using (var scope = host.Services.CreateScope())
         {
