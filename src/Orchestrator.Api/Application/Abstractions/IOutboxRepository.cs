@@ -1,4 +1,4 @@
-using Orchestrator.Api.Domain;
+using ECommerce.Shared.Messaging;
 
 namespace Orchestrator.Api.Application.Abstractions;
 

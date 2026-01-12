@@ -1,4 +1,4 @@
-namespace Stock.Worker.Domain;
+namespace ECommerce.Shared.Messaging;
 
 /// <summary>
 /// Represents an inbox message for idempotent consumer processing.
