@@ -1,6 +1,6 @@
 using ECommerce.Messaging.RabbitMq;
 using ECommerce.Shared.Messaging.Topology;
-using ECommerce.Shared.Persistence;
+using ECommerce.Core.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Orchestrator.Api.Application;
 using Orchestrator.Api.Application.Abstractions;
@@ -35,7 +35,7 @@ public static class Program
                     npgsqlOptions.MigrationsHistoryTable(
                         "__EFMigrationsHistory_Orchestrator",
                         schema: null);
-                    npgsqlOptions.EnableRetryOnFailure();
+                    //npgsqlOptions.EnableRetryOnFailure();
                 }));
         builder.Services.AddScoped<IOrderRepository, OrderRepository>();
         builder.Services.AddScoped<IOutboxRepository, OutboxRepository>();
@@ -55,7 +55,9 @@ public static class Program
         var app = builder.Build();
         app.MapControllers();
 
-        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
+        var logger = loggerFactory.CreateLogger("Stock.Worker");
+
         MigrationExtensions.ApplyMigrationsWithRetryAsync<OrderDbContext>(app.Services, logger)
             .GetAwaiter()
             .GetResult();

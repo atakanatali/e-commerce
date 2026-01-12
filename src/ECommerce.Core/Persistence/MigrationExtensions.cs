@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace ECommerce.Shared.Persistence;
+namespace ECommerce.Core.Persistence;
 
 /// <summary>
 /// Provides helper methods for applying EF Core migrations with retries.
