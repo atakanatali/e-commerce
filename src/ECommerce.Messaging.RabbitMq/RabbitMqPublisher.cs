@@ -1,6 +1,5 @@
 using System.Text.Json;
 using ECommerce.Shared.Messaging;
-using RabbitMQ.Client;
 
 namespace ECommerce.Messaging.RabbitMq;
 
@@ -20,7 +19,15 @@ public sealed class RabbitMqPublisher : IRabbitMqPublisher
         _connectionFactory = connectionFactory;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Publishes events
+    /// </summary>
+    /// <param name="exchange">exchange</param>
+    /// <param name="routingKey">routing key</param>
+    /// <param name="envelope">message model</param>
+    /// <param name="cancellationToken">token</param>
+    /// <typeparam name="TPayload">message payload</typeparam>
+    /// <returns></returns>
     public Task PublishAsync<TPayload>(
         string exchange,
         string routingKey,

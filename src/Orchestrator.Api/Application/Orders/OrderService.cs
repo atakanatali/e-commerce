@@ -33,7 +33,12 @@ public sealed class OrderService : IOrderService
         _unitOfWork = unitOfWork;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Creates order
+    /// </summary>
+    /// <param name="request">request model</param>
+    /// <param name="cancellationToken">token</param>
+    /// <returns></returns>
     public async Task<CreateOrderResponse> CreateOrderAsync(CreateOrderRequest request, CancellationToken cancellationToken)
     {
         var orderId = Guid.NewGuid();

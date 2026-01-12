@@ -19,7 +19,9 @@ public sealed class RabbitMqConnectionFactory : IRabbitMqConnectionFactory
         _options = options.Value;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Creates connection
+    /// </summary>
     public IConnection CreateConnection()
     {
         var factory = new ConnectionFactory

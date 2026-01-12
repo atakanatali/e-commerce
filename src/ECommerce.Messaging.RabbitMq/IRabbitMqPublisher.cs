@@ -15,9 +15,5 @@ public interface IRabbitMqPublisher
     /// <param name="routingKey">The routing key.</param>
     /// <param name="envelope">The message envelope.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    Task PublishAsync<TPayload>(
-        string exchange,
-        string routingKey,
-        MessageEnvelope<TPayload> envelope,
-        CancellationToken cancellationToken);
+    Task PublishAsync<TPayload>(string exchange, string routingKey, MessageEnvelope<TPayload> envelope, CancellationToken cancellationToken);
 }
