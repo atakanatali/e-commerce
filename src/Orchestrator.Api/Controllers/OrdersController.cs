@@ -1,3 +1,4 @@
+using ECommerce.Core.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
 using Orchestrator.Api.Application.Orders;
 using Orchestrator.Api.Contracts;
@@ -9,6 +10,12 @@ namespace Orchestrator.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("orders")]
+[Throttling(
+    key: RateLimitKeyType.Ip | RateLimitKeyType.Path,
+    duration: 1,
+    type: RateLimitTimeUnit.Minute,
+    limit: 100,
+    limitType: RateLimitTimeUnit.Minute)]
 public sealed class OrdersController : ControllerBase
 {
     private readonly IOrderService _orderService;

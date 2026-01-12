@@ -1,7 +1,10 @@
 using ECommerce.Messaging.RabbitMq;
 using ECommerce.Shared.Messaging.Topology;
 using ECommerce.Core.Persistence;
+using ECommerce.Core.RateLimiting;
+using ECommerce.Core.Redis;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.HttpOverrides;
 using Orchestrator.Api.Application;
 using Orchestrator.Api.Application.Abstractions;
 using Orchestrator.Api.Application.Orders;
@@ -46,6 +49,9 @@ public static class Program
         builder.Services.AddMessageBroker(builder.Configuration);
         builder.Services.AddSingleton<ITopologyInitializer, OrderTopologyInitializer>();
 
+        builder.Services.AddRedis(builder.Configuration);
+        builder.Services.AddRedisRateLimiting(builder.Configuration);
+
         builder.Services.AddScoped<StockReservedEventHandler>();
         builder.Services.AddScoped<StockReservationFailedEventHandler>();
 
@@ -53,6 +59,10 @@ public static class Program
         builder.Services.AddHostedService<StockEventsConsumerHostedService>();
 
         var app = builder.Build();
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+        });
         app.MapControllers();
 
         var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
