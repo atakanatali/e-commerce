@@ -15,4 +15,11 @@ RUN dotnet publish src/Orchestrator.Api/Orchestrator.Api.csproj -c Release -o /a
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/publish .
+ENV Redis__Enabled="true" \
+    Redis__Mode="Single" \
+    Redis__ConnectionString="redis:6379" \
+    RateLimiting__Enabled="true" \
+    RateLimiting__Requests="100" \
+    RateLimiting__WindowSeconds="60" \
+    RateLimiting__KeyPrefix="orchestrator"
 ENTRYPOINT ["dotnet", "Orchestrator.Api.dll"]
