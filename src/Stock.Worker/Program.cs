@@ -1,4 +1,5 @@
 using ECommerce.Messaging.RabbitMq;
+using ECommerce.Shared.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Stock.Worker.Application;
 using Stock.Worker.Application.Abstractions;
@@ -23,7 +24,16 @@ public static class Program
         var builder = Host.CreateApplicationBuilder(args);
 
         builder.Services.AddDbContext<StockDbContext>(options =>
-            options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+            options.UseNpgsql(
+                builder.Configuration.GetConnectionString("Default"),
+                npgsqlOptions =>
+                {
+                    npgsqlOptions.MigrationsAssembly(typeof(Program).Assembly.FullName);
+                    npgsqlOptions.MigrationsHistoryTable(
+                        "__EFMigrationsHistory_Stock",
+                        schema: null);
+                    npgsqlOptions.EnableRetryOnFailure();
+                }));
         builder.Services.AddScoped<IStockRepository, StockRepository>();
         builder.Services.AddScoped<IStockReservationService, StockReservationService>();
 
@@ -36,6 +46,11 @@ public static class Program
         builder.Services.AddHostedService<OrderEventsConsumerHostedService>();
 
         var host = builder.Build();
+
+        var logger = host.Services.GetRequiredService<ILogger<Program>>();
+        MigrationExtensions.ApplyMigrationsWithRetryAsync<StockDbContext>(host.Services, logger)
+            .GetAwaiter()
+            .GetResult();
 
         using (var scope = host.Services.CreateScope())
         {

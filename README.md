@@ -67,6 +67,46 @@ When running locally, use the following host values for infrastructure:
 - RabbitMQ host: `localhost`
 - PostgreSQL host: `localhost`
 
+## Database Migrations (Per Service)
+Each service owns its own EF Core migrations and history table. On startup, each service applies
+its pending migrations automatically with retry logic, so the database schema stays in sync.
+
+History tables:
+- Orchestrator.Api: `__EFMigrationsHistory_Orchestrator`
+- Stock.Worker: `__EFMigrationsHistory_Stock`
+- Notification.Worker: `__EFMigrationsHistory_Notification`
+
+### Add a migration
+Run migrations from the repository root:
+
+```bash
+dotnet ef migrations add <Name> \
+  --project src/Orchestrator.Api \
+  --startup-project src/Orchestrator.Api \
+  --context OrderDbContext \
+  --output-dir Migrations
+```
+
+```bash
+dotnet ef migrations add <Name> \
+  --project src/Stock.Worker \
+  --startup-project src/Stock.Worker \
+  --context StockDbContext \
+  --output-dir Migrations
+```
+
+```bash
+dotnet ef migrations add <Name> \
+  --project src/Notification.Worker \
+  --startup-project src/Notification.Worker \
+  --context NotificationDbContext \
+  --output-dir Migrations
+```
+
+### Auto-apply on startup
+Each service calls `Database.Migrate()` with retries on startup. This is idempotent and uses
+service-specific migration history tables to prevent cross-service collisions.
+
 ## Solution and Package Management
 The root `Directory.Build.props` enables **restore on build** so Rider's **Rebuild Solution** downloads NuGet packages automatically via `RestoreOnBuild`.
 

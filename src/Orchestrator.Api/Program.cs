@@ -1,5 +1,6 @@
 using ECommerce.Messaging.RabbitMq;
 using ECommerce.Shared.Messaging.Topology;
+using ECommerce.Shared.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Orchestrator.Api.Application;
 using Orchestrator.Api.Application.Abstractions;
@@ -26,7 +27,16 @@ public static class Program
 
         builder.Services.AddControllers();
         builder.Services.AddDbContext<OrderDbContext>(options =>
-            options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+            options.UseNpgsql(
+                builder.Configuration.GetConnectionString("Default"),
+                npgsqlOptions =>
+                {
+                    npgsqlOptions.MigrationsAssembly(typeof(Program).Assembly.FullName);
+                    npgsqlOptions.MigrationsHistoryTable(
+                        "__EFMigrationsHistory_Orchestrator",
+                        schema: null);
+                    npgsqlOptions.EnableRetryOnFailure();
+                }));
         builder.Services.AddScoped<IOrderRepository, OrderRepository>();
         builder.Services.AddScoped<IOutboxRepository, OutboxRepository>();
         builder.Services.AddScoped<IOrderUnitOfWork, OrderUnitOfWork>();
@@ -44,6 +54,11 @@ public static class Program
 
         var app = builder.Build();
         app.MapControllers();
+
+        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        MigrationExtensions.ApplyMigrationsWithRetryAsync<OrderDbContext>(app.Services, logger)
+            .GetAwaiter()
+            .GetResult();
 
         using (var scope = app.Services.CreateScope())
         {
