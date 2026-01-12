@@ -5,13 +5,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ECommerce.Core\ECommerce.Core.csproj" />
-    <ProjectReference Include="..\ECommerce.Messaging.RabbitMq\ECommerce.Messaging.RabbitMq.csproj" />
-    <ProjectReference Include="..\ECommerce.Shared\ECommerce.Shared.csproj" />
+    <ProjectReference Include="../ECommerce.Core/ECommerce.Core.csproj" />
+    <ProjectReference Include="../ECommerce.Messaging.RabbitMq/ECommerce.Messaging.RabbitMq.csproj" />
+    <ProjectReference Include="../ECommerce.Shared/ECommerce.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.3" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
     <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
   </ItemGroup>
