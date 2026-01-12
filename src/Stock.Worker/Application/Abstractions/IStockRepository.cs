@@ -1,4 +1,5 @@
 using ECommerce.Shared.Contracts.Events;
+using ECommerce.Shared.Messaging;
 using Stock.Worker.Domain;
 
 namespace Stock.Worker.Application.Abstractions;

@@ -1,5 +1,5 @@
+using ECommerce.Shared.Messaging;
 using Orchestrator.Api.Application.Abstractions;
-using Orchestrator.Api.Domain;
 using Orchestrator.Api.Infrastructure.Persistence;
 
 namespace Orchestrator.Api.Infrastructure.Outbox;
@@ -20,7 +20,10 @@ public sealed class OutboxRepository : IOutboxRepository
         _dbContext = dbContext;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Adds an outbox message to the database context for later persistence.
+    /// </summary>
+    /// <param name="message">The outbox message to enqueue.</param>
     public void Add(OutboxMessage message)
     {
         _dbContext.OutboxMessages.Add(message);

@@ -1,3 +1,5 @@
+using ECommerce.Core.Persistence;
+using ECommerce.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Orchestrator.Api.Domain;
 
@@ -38,7 +40,7 @@ public sealed class OrderDbContext : DbContext
     public DbSet<InboxMessage> InboxMessages => Set<InboxMessage>();
 
     /// <summary>
-    /// Configures the database model.
+    /// Configures entity mappings for orders, order items, and shared inbox/outbox tables.
     /// </summary>
     /// <param name="modelBuilder">The model builder.</param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -64,25 +66,6 @@ public sealed class OrderDbContext : DbContext
             entity.HasIndex(item => item.OrderId);
         });
 
-        modelBuilder.Entity<OutboxMessage>(entity =>
-        {
-            entity.ToTable("outbox_messages");
-            entity.HasKey(message => message.Id);
-            entity.HasIndex(message => message.ProcessedAtUtc)
-                .HasDatabaseName("idx_outbox_unprocessed");
-            entity.HasIndex(message => message.MessageId).IsUnique();
-            entity.Property(message => message.PayloadJson).HasColumnType("jsonb");
-            entity.Property(message => message.OccurredAtUtc).HasColumnType("timestamptz");
-            entity.Property(message => message.ProcessedAtUtc).HasColumnType("timestamptz");
-        });
-
-        modelBuilder.Entity<InboxMessage>(entity =>
-        {
-            entity.ToTable("inbox_messages");
-            entity.HasKey(message => message.MessageId);
-            entity.HasIndex(message => message.Status).HasDatabaseName("idx_inbox_status");
-            entity.Property(message => message.ReceivedAtUtc).HasColumnType("timestamptz");
-            entity.Property(message => message.ProcessedAtUtc).HasColumnType("timestamptz");
-        });
+        modelBuilder.ConfigureInboxOutboxMessages();
     }
 }

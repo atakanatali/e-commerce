@@ -1,4 +1,4 @@
-namespace Stock.Worker.Domain;
+namespace ECommerce.Shared.Messaging;
 
 /// <summary>
 /// Represents a transactional outbox message.
