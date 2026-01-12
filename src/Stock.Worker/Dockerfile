@@ -2,6 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ECommerce.sln ./
 COPY Directory.Build.props ./
+COPY Directory.Packages.props ./
 COPY src/ECommerce.Core/ECommerce.Core.csproj src/ECommerce.Core/
 COPY src/ECommerce.Messaging.RabbitMq/ECommerce.Messaging.RabbitMq.csproj src/ECommerce.Messaging.RabbitMq/
 COPY src/ECommerce.Shared/ECommerce.Shared.csproj src/ECommerce.Shared/
