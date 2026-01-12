@@ -5,9 +5,7 @@ namespace ECommerce.Shared.Contracts.Commands;
 /// </summary>
 /// <param name="OrderId">The order identifier.</param>
 /// <param name="Items">The items to release.</param>
-public sealed record ReleaseStockCommand(
-    Guid OrderId,
-    IReadOnlyCollection<ReleaseStockItem> Items);
+public sealed record ReleaseStockCommand(Guid OrderId, IReadOnlyCollection<ReleaseStockItem> Items);
 
 /// <summary>
 /// Represents a stock item to release.

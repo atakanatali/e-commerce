@@ -22,7 +22,11 @@ public sealed class NotificationService : INotificationService
         _notificationLogRepository = notificationLogRepository;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Handles order confirmed notification
+    /// </summary>
+    /// <param name="message">message</param>
+    /// <param name="cancellationToken">cancellation token</param>
     public async Task HandleOrderConfirmedAsync(
         MessageEnvelope<OrderConfirmedEvent> message,
         CancellationToken cancellationToken)
@@ -30,7 +34,14 @@ public sealed class NotificationService : INotificationService
         await EnsureNotificationAsync(message, "email", "order-confirmed-email", cancellationToken);
         await EnsureNotificationAsync(message, "sms", "order-confirmed-sms", cancellationToken);
     }
-
+    
+    /// <summary>
+    /// Ensures notification
+    /// </summary>
+    /// <param name="message">message</param>
+    /// <param name="channel">channel</param>
+    /// <param name="template">template</param>
+    /// <param name="cancellationToken">token</param>
     private async Task EnsureNotificationAsync(
         MessageEnvelope<OrderConfirmedEvent> message,
         string channel,
@@ -74,6 +85,11 @@ public sealed class NotificationService : INotificationService
         await SendNotificationAsync(log, cancellationToken);
     }
 
+    /// <summary>
+    /// Sends notification
+    /// </summary>
+    /// <param name="log">log</param>
+    /// <param name="cancellationToken">token</param>
     private async Task SendNotificationAsync(NotificationLog log, CancellationToken cancellationToken)
     {
         log.Attempt++;

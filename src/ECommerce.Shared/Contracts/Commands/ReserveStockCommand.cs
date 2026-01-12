@@ -6,10 +6,7 @@ namespace ECommerce.Shared.Contracts.Commands;
 /// <param name="OrderId">The order identifier.</param>
 /// <param name="Items">The items to reserve.</param>
 /// <param name="ReservationExpiresAtUtc">The optional reservation expiry time.</param>
-public sealed record ReserveStockCommand(
-    Guid OrderId,
-    IReadOnlyCollection<ReserveStockItem> Items,
-    DateTime? ReservationExpiresAtUtc);
+public sealed record ReserveStockCommand(Guid OrderId, IReadOnlyCollection<ReserveStockItem> Items, DateTime? ReservationExpiresAtUtc);
 
 /// <summary>
 /// Represents a stock item to reserve.

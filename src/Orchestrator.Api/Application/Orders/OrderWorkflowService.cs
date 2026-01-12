@@ -26,7 +26,11 @@ public sealed class OrderWorkflowService : IOrderWorkflowService
         _outboxRepository = outboxRepository;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Confirmes order
+    /// </summary>
+    /// <param name="message">message</param>
+    /// <param name="cancellationToken">token</param>
     public async Task ConfirmOrderAsync(
         MessageEnvelope<StockReservedEvent> message,
         CancellationToken cancellationToken)
@@ -78,7 +82,11 @@ public sealed class OrderWorkflowService : IOrderWorkflowService
         await _orderRepository.SaveChangesAsync(cancellationToken);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Cancels order
+    /// </summary>
+    /// <param name="message">message</param>
+    /// <param name="cancellationToken">token</param>
     public async Task CancelOrderAsync(
         MessageEnvelope<StockReservationFailedEvent> message,
         CancellationToken cancellationToken)
