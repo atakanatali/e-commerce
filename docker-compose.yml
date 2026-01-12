@@ -27,6 +27,7 @@ services:
       RabbitMQ__Host: rabbitmq
       RabbitMQ__User: guest
       RabbitMQ__Pass: guest
+      RabbitMQ__VirtualHost: /
       RabbitMQ__ServiceName: order-service
     depends_on:
       - rabbitmq
@@ -43,6 +44,7 @@ services:
       RabbitMQ__Host: rabbitmq
       RabbitMQ__User: guest
       RabbitMQ__Pass: guest
+      RabbitMQ__VirtualHost: /
       RabbitMQ__ServiceName: stock-service
     depends_on:
       - rabbitmq
@@ -57,6 +59,7 @@ services:
       RabbitMQ__Host: rabbitmq
       RabbitMQ__User: guest
       RabbitMQ__Pass: guest
+      RabbitMQ__VirtualHost: /
       RabbitMQ__ServiceName: notification-service
     depends_on:
       - rabbitmq

@@ -29,6 +29,7 @@ public sealed class RabbitMqConnectionFactory : IRabbitMqConnectionFactory
             HostName = _options.Host,
             UserName = _options.User,
             Password = _options.Pass,
+            VirtualHost = _options.VirtualHost,
             DispatchConsumersAsync = true
         };
 

@@ -21,6 +21,11 @@ public sealed class RabbitMqOptions
     public string Pass { get; set; } = "guest";
 
     /// <summary>
+    /// Gets or sets the virtual host.
+    /// </summary>
+    public string VirtualHost { get; set; } = "/";
+
+    /// <summary>
     /// Gets or sets the service name.
     /// </summary>
     public string ServiceName { get; set; } = "order-service";
