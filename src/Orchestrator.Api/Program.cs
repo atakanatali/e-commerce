@@ -45,12 +45,11 @@ public static class Program
         var app = builder.Build();
         app.MapControllers();
 
-        app.Lifetime.ApplicationStarted.Register(() =>
+        using (var scope = app.Services.CreateScope())
         {
-            using var scope = app.Services.CreateScope();
             var initializer = scope.ServiceProvider.GetRequiredService<ITopologyInitializer>();
             initializer.Initialize();
-        });
+        }
 
         app.Run();
     }
