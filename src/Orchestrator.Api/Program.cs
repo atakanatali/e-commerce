@@ -5,6 +5,7 @@ using ECommerce.Core.RateLimiting;
 using ECommerce.Core.Redis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Orchestrator.Api.Application;
 using Orchestrator.Api.Application.Abstractions;
 using Orchestrator.Api.Application.Orders;
@@ -39,7 +40,8 @@ public static class Program
                         "__EFMigrationsHistory_Orchestrator",
                         schema: null);
                     //npgsqlOptions.EnableRetryOnFailure();
-                }));
+                }).ConfigureWarnings(warnings =>
+                warnings.Ignore(RelationalEventId.PendingModelChangesWarning)));
         builder.Services.AddScoped<IOrderRepository, OrderRepository>();
         builder.Services.AddScoped<IOutboxRepository, OutboxRepository>();
         builder.Services.AddScoped<IOrderUnitOfWork, OrderUnitOfWork>();

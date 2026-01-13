@@ -1,6 +1,7 @@
 using ECommerce.Messaging.RabbitMq;
 using ECommerce.Core.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Notification.Worker.Application;
 using Notification.Worker.Application.Abstractions;
 using Notification.Worker.Infrastructure.Consumers;
@@ -33,7 +34,8 @@ public static class Program
                         "__EFMigrationsHistory_Notification",
                         schema: null);
                     //npgsqlOptions.EnableRetryOnFailure();
-                }));
+                }).ConfigureWarnings(warnings =>
+                warnings.Ignore(RelationalEventId.PendingModelChangesWarning)));
         builder.Services.AddScoped<INotificationLogRepository, NotificationLogRepository>();
         builder.Services.AddScoped<INotificationService, NotificationService>();
 

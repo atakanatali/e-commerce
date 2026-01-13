@@ -1,6 +1,7 @@
 using ECommerce.Messaging.RabbitMq;
 using ECommerce.Core.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Stock.Worker.Application;
 using Stock.Worker.Application.Abstractions;
 using Stock.Worker.Infrastructure.Consumers;
@@ -33,7 +34,8 @@ public static class Program
                         "__EFMigrationsHistory_Stock",
                         schema: null);
                     //npgsqlOptions.EnableRetryOnFailure();
-                }));
+                }).ConfigureWarnings(warnings =>
+            warnings.Ignore(RelationalEventId.PendingModelChangesWarning)));
         builder.Services.AddScoped<IStockRepository, StockRepository>();
         builder.Services.AddScoped<IStockReservationService, StockReservationService>();
 
