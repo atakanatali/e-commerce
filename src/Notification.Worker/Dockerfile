@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 COPY ECommerce.sln ./
 COPY Directory.Build.props ./
@@ -16,7 +16,7 @@ COPY src/ECommerce.Shared src/ECommerce.Shared
 COPY src/Notification.Worker src/Notification.Worker
 RUN dotnet publish src/Notification.Worker/Notification.Worker.csproj -c Release -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/runtime:8.0
+FROM mcr.microsoft.com/dotnet/runtime:9.0
 WORKDIR /app
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "Notification.Worker.dll"]
