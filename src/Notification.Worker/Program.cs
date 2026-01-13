@@ -1,8 +1,11 @@
-using ECommerce.Messaging.RabbitMq;
-using ECommerce.Core.Persistence;
 using ECommerce.Core.Logging;
+using ECommerce.Core.Persistence;
+using ECommerce.Messaging.RabbitMq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Notification.Worker.Application;
 using Notification.Worker.Application.Abstractions;
 using Notification.Worker.Infrastructure.Consumers;
@@ -10,6 +13,8 @@ using Notification.Worker.Infrastructure.Messaging;
 using Notification.Worker.Infrastructure.Outbox;
 using Notification.Worker.Infrastructure.Persistence;
 using Serilog;
+
+using LoggingServiceCollectionExtensions = ECommerce.Core.Logging.LoggingServiceCollectionExtensions;
 
 namespace Notification.Worker;
 
@@ -24,41 +29,45 @@ public static class Program
     /// <param name="args">The command-line arguments.</param>
     public static void Main(string[] args)
     {
-        var builder = Host.CreateApplicationBuilder(args);
+        var host = Host.CreateDefaultBuilder(args)
+            .UseSerilog((context, services, loggerConfiguration) =>
+            {
+                LoggingServiceCollectionExtensions.ConfigureSerilog(
+                    loggerConfiguration,
+                    context.Configuration,
+                    context.HostingEnvironment.EnvironmentName,
+                    services,
+                    "notification-worker");
+            })
+            .ConfigureServices((context, services) =>
+            {
+                services.AddLogging(context.Configuration, "notification-worker");
 
-        builder.Services.AddLogging(builder.Configuration, "notification-worker");
-        builder.Host.UseSerilog((context, services, loggerConfiguration) =>
-            LoggingServiceCollectionExtensions.ConfigureSerilog(
-                loggerConfiguration,
-                context.Configuration,
-                context.HostingEnvironment.EnvironmentName,
-                services,
-                "notification-worker"));
+                services.AddDbContext<NotificationDbContext>(options =>
+                    options.UseNpgsql(
+                        context.Configuration.GetConnectionString("Default"),
+                        npgsqlOptions =>
+                        {
+                            npgsqlOptions.MigrationsAssembly(typeof(Program).Assembly.FullName);
+                            npgsqlOptions.MigrationsHistoryTable(
+                                "__EFMigrationsHistory_Notification",
+                                schema: null);
+                        })
+                    .ConfigureWarnings(warnings =>
+                        warnings.Ignore(RelationalEventId.PendingModelChangesWarning)));
 
-        builder.Services.AddDbContext<NotificationDbContext>(options =>
-            options.UseNpgsql(
-                builder.Configuration.GetConnectionString("Default"),
-                npgsqlOptions =>
-                {
-                    npgsqlOptions.MigrationsAssembly(typeof(Program).Assembly.FullName);
-                    npgsqlOptions.MigrationsHistoryTable(
-                        "__EFMigrationsHistory_Notification",
-                        schema: null);
-                    //npgsqlOptions.EnableRetryOnFailure();
-                }).ConfigureWarnings(warnings =>
-                warnings.Ignore(RelationalEventId.PendingModelChangesWarning)));
-        builder.Services.AddScoped<INotificationLogRepository, NotificationLogRepository>();
-        builder.Services.AddScoped<INotificationService, NotificationService>();
+                services.AddScoped<INotificationLogRepository, NotificationLogRepository>();
+                services.AddScoped<INotificationService, NotificationService>();
 
-        builder.Services.AddMessageBroker(builder.Configuration);
-        builder.Services.AddSingleton<ITopologyInitializer, NotificationTopologyInitializer>();
+                services.AddMessageBroker(context.Configuration);
+                services.AddSingleton<ITopologyInitializer, NotificationTopologyInitializer>();
 
-        builder.Services.AddScoped<OrderConfirmedEventHandler>();
+                services.AddScoped<OrderConfirmedEventHandler>();
 
-        builder.Services.AddHostedService<OutboxPublisherHostedService>();
-        builder.Services.AddHostedService<OrderConfirmedConsumerHostedService>();
-
-        var host = builder.Build();
+                services.AddHostedService<OutboxPublisherHostedService>();
+                services.AddHostedService<OrderConfirmedConsumerHostedService>();
+            })
+            .Build();
 
         var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
         var logger = loggerFactory.CreateLogger("notification-worker");

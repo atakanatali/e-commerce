@@ -15,6 +15,7 @@ using Orchestrator.Api.Infrastructure.Messaging;
 using Orchestrator.Api.Infrastructure.Outbox;
 using Orchestrator.Api.Infrastructure.Persistence;
 using Serilog;
+using LoggingServiceCollectionExtensions = ECommerce.Core.Logging.LoggingServiceCollectionExtensions;
 
 namespace Orchestrator.Api;
 
