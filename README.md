@@ -1,6 +1,6 @@
 # E-Commerce Microservices Solution
 
-This repository contains a .NET 8 microservices sample that models a simple e-commerce flow (order creation → stock reservation → notification). Services communicate asynchronously via RabbitMQ and each service has its own PostgreSQL database.
+This repository contains a .NET 9 microservices sample that models a simple e-commerce flow (order creation → stock reservation → notification). Services communicate asynchronously via RabbitMQ and each service has its own PostgreSQL database.
 
 ## Table of Contents
 - [Architecture Overview](#architecture-overview)
@@ -26,7 +26,7 @@ Flow summary:
 - **ECommerce.Shared**: Shared models/contracts and helpers.
 
 ## Prerequisites
-- .NET SDK 8.0
+- .NET SDK 9.0
 - Docker & Docker Compose (optional, recommended)
 - PostgreSQL and RabbitMQ (automatically provided via Docker)
 
