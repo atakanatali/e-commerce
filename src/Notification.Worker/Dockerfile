@@ -19,12 +19,4 @@ RUN dotnet publish src/Notification.Worker/Notification.Worker.csproj -c Release
 FROM mcr.microsoft.com/dotnet/runtime:9.0
 WORKDIR /app
 COPY --from=build /app/publish .
-ENV Logging__Elasticsearch__Enabled="true" \
-    Logging__Elasticsearch__Uri="http://elasticsearch:9200" \
-    Logging__Elasticsearch__IndexPrefix="logs" \
-    Logging__Elasticsearch__MinimumLevel="Information" \
-    Logging__Elasticsearch__AutoRegisterTemplate="true" \
-    Logging__Elasticsearch__BatchPostingLimit="1000" \
-    Logging__Elasticsearch__PeriodSeconds="2" \
-    Correlation__HeaderName="X-Correlation-Id"
 ENTRYPOINT ["dotnet", "Notification.Worker.dll"]

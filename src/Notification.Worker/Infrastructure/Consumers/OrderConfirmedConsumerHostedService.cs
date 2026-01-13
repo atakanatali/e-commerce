@@ -4,7 +4,6 @@ using ECommerce.Shared.Messaging;
 using ECommerce.Shared.Messaging.Topology;
 using ECommerce.Messaging.RabbitMq;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Notification.Worker.Application;
 using Notification.Worker.Domain;
 using Notification.Worker.Infrastructure.Persistence;
@@ -20,22 +19,18 @@ public sealed class OrderConfirmedConsumerHostedService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IRabbitMqConnectionFactory _connectionFactory;
-    private readonly ILogger<OrderConfirmedConsumerHostedService> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OrderConfirmedConsumerHostedService"/> class.
     /// </summary>
     /// <param name="serviceProvider">The service provider.</param>
     /// <param name="connectionFactory">The connection factory.</param>
-    /// <param name="logger">The logger instance.</param>
     public OrderConfirmedConsumerHostedService(
         IServiceProvider serviceProvider,
-        IRabbitMqConnectionFactory connectionFactory,
-        ILogger<OrderConfirmedConsumerHostedService> logger)
+        IRabbitMqConnectionFactory connectionFactory)
     {
         _serviceProvider = serviceProvider;
         _connectionFactory = connectionFactory;
-        _logger = logger;
     }
 
     /// <summary>
@@ -45,29 +40,18 @@ public sealed class OrderConfirmedConsumerHostedService : BackgroundService
     /// <returns>A task that represents the asynchronous operation.</returns>
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        try
-        {
-            var connection = _connectionFactory.CreateConnection();
-            var channel = connection.CreateModel();
-            channel.BasicQos(0, 10, false);
+        var connection = _connectionFactory.CreateConnection();
+        var channel = connection.CreateModel();
+        channel.BasicQos(0, 10, false);
 
-            var consumer = new AsyncEventingBasicConsumer(channel);
-            consumer.Received += async (_, args) =>
-            {
-                await HandleMessageAsync(channel, args, stoppingToken);
-            };
-
-            channel.BasicConsume(TopologyConstants.NotificationQueues.OrderConfirmedQueue, autoAck: false, consumer: consumer);
-            return Task.CompletedTask;
-        }
-        catch (Exception ex)
+        var consumer = new AsyncEventingBasicConsumer(channel);
+        consumer.Received += async (_, args) =>
         {
-            _logger.LogError(
-                ex,
-                "Order confirmed consumer failed to start for queue {QueueName}.",
-                TopologyConstants.NotificationQueues.OrderConfirmedQueue);
-            throw;
-        }
+            await HandleMessageAsync(channel, args, stoppingToken);
+        };
+
+        channel.BasicConsume(TopologyConstants.NotificationQueues.OrderConfirmedQueue, autoAck: false, consumer: consumer);
+        return Task.CompletedTask;
     }
 
     /// <summary>
