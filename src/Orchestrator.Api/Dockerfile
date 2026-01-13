@@ -25,5 +25,13 @@ ENV Redis__Enabled="true" \
     RateLimiting__Enabled="true" \
     RateLimiting__Requests="100" \
     RateLimiting__WindowSeconds="60" \
-    RateLimiting__KeyPrefix="orchestrator"
+    RateLimiting__KeyPrefix="orchestrator" \
+    Logging__Elasticsearch__Enabled="true" \
+    Logging__Elasticsearch__Uri="http://elasticsearch:9200" \
+    Logging__Elasticsearch__IndexPrefix="logs" \
+    Logging__Elasticsearch__MinimumLevel="Information" \
+    Logging__Elasticsearch__AutoRegisterTemplate="true" \
+    Logging__Elasticsearch__BatchPostingLimit="1000" \
+    Logging__Elasticsearch__PeriodSeconds="2" \
+    Correlation__HeaderName="X-Correlation-Id"
 ENTRYPOINT ["dotnet", "Orchestrator.Api.dll"]

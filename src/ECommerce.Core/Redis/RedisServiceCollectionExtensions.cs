@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using StackExchange.Redis;
 
 namespace ECommerce.Core.Redis;
@@ -44,6 +45,7 @@ public static class RedisServiceCollectionExtensions
         {
             if (string.IsNullOrWhiteSpace(options.ConnectionString))
             {
+                Log.Logger.Error("Redis is enabled but no connection string was configured.");
                 throw new InvalidOperationException("Redis is enabled but no connection string was configured.");
             }
 
@@ -53,6 +55,7 @@ public static class RedisServiceCollectionExtensions
         {
             if (options.Endpoints.Length == 0)
             {
+                Log.Logger.Error("Redis is enabled in cluster mode but no endpoints were configured.");
                 throw new InvalidOperationException("Redis is enabled in cluster mode but no endpoints were configured.");
             }
 

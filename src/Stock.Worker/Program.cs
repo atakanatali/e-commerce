@@ -1,5 +1,6 @@
 using ECommerce.Messaging.RabbitMq;
 using ECommerce.Core.Persistence;
+using ECommerce.Core.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Stock.Worker.Application;
@@ -8,6 +9,7 @@ using Stock.Worker.Infrastructure.Consumers;
 using Stock.Worker.Infrastructure.Messaging;
 using Stock.Worker.Infrastructure.Outbox;
 using Stock.Worker.Infrastructure.Persistence;
+using Serilog;
 
 namespace Stock.Worker;
 
@@ -23,6 +25,15 @@ public static class Program
     public static void Main(string[] args)
     {
         var builder = Host.CreateApplicationBuilder(args);
+
+        builder.Services.AddLogging(builder.Configuration, "stock-worker");
+        builder.Host.UseSerilog((context, services, loggerConfiguration) =>
+            LoggingServiceCollectionExtensions.ConfigureSerilog(
+                loggerConfiguration,
+                context.Configuration,
+                context.HostingEnvironment.EnvironmentName,
+                services,
+                "stock-worker"));
 
         builder.Services.AddDbContext<StockDbContext>(options =>
             options.UseNpgsql(
@@ -50,18 +61,28 @@ public static class Program
         var host = builder.Build();
 
         var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
-        var logger = loggerFactory.CreateLogger("Stock.Worker");
+        var logger = loggerFactory.CreateLogger("stock-worker");
 
-        MigrationExtensions.ApplyMigrationsWithRetryAsync<StockDbContext>(host.Services, logger)
-            .GetAwaiter()
-            .GetResult();
+        WorkerExceptionHandlingExtensions.RegisterGlobalExceptionHandlers(logger, "stock-worker");
 
-        using (var scope = host.Services.CreateScope())
+        try
         {
-            var initializer = scope.ServiceProvider.GetRequiredService<ITopologyInitializer>();
-            initializer.Initialize();
-        }
+            MigrationExtensions.ApplyMigrationsWithRetryAsync<StockDbContext>(host.Services, logger)
+                .GetAwaiter()
+                .GetResult();
 
-        host.Run();
+            using (var scope = host.Services.CreateScope())
+            {
+                var initializer = scope.ServiceProvider.GetRequiredService<ITopologyInitializer>();
+                initializer.Initialize();
+            }
+
+            host.Run();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Worker stock-worker terminated unexpectedly during startup.");
+            throw;
+        }
     }
 }
