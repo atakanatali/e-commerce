@@ -11,7 +11,7 @@ public partial class NotificationDbContextModelSnapshot : ModelSnapshot
     /// <inheritdoc />
     protected override void BuildModel(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasAnnotation("ProductVersion", "8.0.4");
+        modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
 
         modelBuilder.Entity("ECommerce.Shared.Messaging.InboxMessage", b =>
         {
