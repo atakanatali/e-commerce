@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace ECommerce.Core.RateLimiting;
@@ -95,7 +96,7 @@ public sealed class ThrottlingAttribute : Attribute, IAsyncActionFilter
         {
             context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
             var retryAfterSeconds = Math.Max((int)Math.Ceiling(result.RetryAfter.TotalSeconds), 0);
-            context.HttpContext.Response.Headers.RetryAfter = retryAfterSeconds;
+            context.HttpContext.Response.Headers.RetryAfter = retryAfterSeconds.ToString();
             return;
         }
 
