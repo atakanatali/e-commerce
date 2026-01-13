@@ -2,7 +2,6 @@ using System.Text.Json;
 using ECommerce.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
 using ECommerce.Messaging.RabbitMq;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Stock.Worker.Infrastructure.Persistence;
 
@@ -16,7 +15,6 @@ public sealed class OutboxPublisherHostedService : BackgroundService
     private readonly IServiceProvider _serviceProvider;
     private readonly IRabbitMqPublisher _publisher;
     private readonly RabbitMqOptions _options;
-    private readonly ILogger<OutboxPublisherHostedService> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OutboxPublisherHostedService"/> class.
@@ -24,17 +22,14 @@ public sealed class OutboxPublisherHostedService : BackgroundService
     /// <param name="serviceProvider">The service provider.</param>
     /// <param name="publisher">The RabbitMQ publisher.</param>
     /// <param name="options">The RabbitMQ options.</param>
-    /// <param name="logger">The logger instance.</param>
     public OutboxPublisherHostedService(
         IServiceProvider serviceProvider,
         IRabbitMqPublisher publisher,
-        IOptions<RabbitMqOptions> options,
-        ILogger<OutboxPublisherHostedService> logger)
+        IOptions<RabbitMqOptions> options)
     {
         _serviceProvider = serviceProvider;
         _publisher = publisher;
         _options = options.Value;
-        _logger = logger;
     }
 
     /// <summary>
@@ -44,21 +39,10 @@ public sealed class OutboxPublisherHostedService : BackgroundService
     /// <returns>A task that represents the asynchronous operation.</returns>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        try
+        while (!stoppingToken.IsCancellationRequested)
         {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                await PublishBatchAsync(stoppingToken);
-                await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(
-                ex,
-                "Outbox publisher encountered a fatal error for service {ServiceName}.",
-                _options.ServiceName);
-            throw;
+            await PublishBatchAsync(stoppingToken);
+            await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
         }
     }
 

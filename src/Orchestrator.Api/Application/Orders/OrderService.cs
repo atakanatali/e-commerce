@@ -2,7 +2,6 @@ using System.Text.Json;
 using ECommerce.Shared.Contracts.Events;
 using ECommerce.Shared.Messaging;
 using ECommerce.Shared.Messaging.Topology;
-using Microsoft.Extensions.Logging;
 using Orchestrator.Api.Application.Abstractions;
 using Orchestrator.Api.Contracts;
 using Orchestrator.Api.Domain;
@@ -17,7 +16,6 @@ public sealed class OrderService : IOrderService
     private readonly IOrderRepository _orderRepository;
     private readonly IOutboxRepository _outboxRepository;
     private readonly IOrderUnitOfWork _unitOfWork;
-    private readonly ILogger<OrderService> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OrderService"/> class.
@@ -25,17 +23,14 @@ public sealed class OrderService : IOrderService
     /// <param name="orderRepository">The order repository.</param>
     /// <param name="outboxRepository">The outbox repository.</param>
     /// <param name="unitOfWork">The unit of work.</param>
-    /// <param name="logger">The logger instance.</param>
     public OrderService(
         IOrderRepository orderRepository,
         IOutboxRepository outboxRepository,
-        IOrderUnitOfWork unitOfWork,
-        ILogger<OrderService> logger)
+        IOrderUnitOfWork unitOfWork)
     {
         _orderRepository = orderRepository;
         _outboxRepository = outboxRepository;
         _unitOfWork = unitOfWork;
-        _logger = logger;
     }
 
     /// <summary>
@@ -114,14 +109,9 @@ public sealed class OrderService : IOrderService
             await _orderRepository.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
         }
-        catch (Exception ex)
+        catch
         {
             await transaction.RollbackAsync(cancellationToken);
-            _logger.LogError(
-                ex,
-                "Failed to create order {OrderId} for user {UserId} during transaction commit.",
-                orderId,
-                request.UserId);
             throw;
         }
 

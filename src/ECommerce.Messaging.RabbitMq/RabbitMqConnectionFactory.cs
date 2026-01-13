@@ -19,7 +19,6 @@ public sealed class RabbitMqConnectionFactory : IRabbitMqConnectionFactory
     /// Initializes a new instance of the <see cref="RabbitMqConnectionFactory"/> class.
     /// </summary>
     /// <param name="options">The RabbitMQ options.</param>
-    /// <param name="logger">The logger instance.</param>
     public RabbitMqConnectionFactory(IOptions<RabbitMqOptions> options, ILogger<RabbitMqConnectionFactory> logger)
     {
         _options = options.Value;
@@ -68,10 +67,6 @@ public sealed class RabbitMqConnectionFactory : IRabbitMqConnectionFactory
             }
         }
 
-        _logger.LogError(
-            "RabbitMQ connection attempts exhausted after {MaxAttempts} attempts to {Host}.",
-            MaxAttempts,
-            _options.Host);
         throw new InvalidOperationException("RabbitMQ connection attempts exhausted.");
     }
 }
