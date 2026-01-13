@@ -4,6 +4,7 @@ using ECommerce.Shared.Messaging;
 using ECommerce.Shared.Messaging.Topology;
 using ECommerce.Messaging.RabbitMq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Orchestrator.Api.Application;
 using Orchestrator.Api.Domain;
 using Orchestrator.Api.Infrastructure.Persistence;
@@ -19,18 +20,22 @@ public sealed class StockEventsConsumerHostedService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IRabbitMqConnectionFactory _connectionFactory;
+    private readonly ILogger<StockEventsConsumerHostedService> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StockEventsConsumerHostedService"/> class.
     /// </summary>
     /// <param name="serviceProvider">The service provider.</param>
     /// <param name="connectionFactory">The connection factory.</param>
+    /// <param name="logger">The logger instance.</param>
     public StockEventsConsumerHostedService(
         IServiceProvider serviceProvider,
-        IRabbitMqConnectionFactory connectionFactory)
+        IRabbitMqConnectionFactory connectionFactory,
+        ILogger<StockEventsConsumerHostedService> logger)
     {
         _serviceProvider = serviceProvider;
         _connectionFactory = connectionFactory;
+        _logger = logger;
     }
 
     /// <summary>
@@ -40,18 +45,29 @@ public sealed class StockEventsConsumerHostedService : BackgroundService
     /// <returns>A task that represents the asynchronous operation.</returns>
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var connection = _connectionFactory.CreateConnection();
-        var channel = connection.CreateModel();
-        channel.BasicQos(0, 10, false);
-
-        var consumer = new AsyncEventingBasicConsumer(channel);
-        consumer.Received += async (_, args) =>
+        try
         {
-            await HandleMessageAsync(channel, args, stoppingToken);
-        };
+            var connection = _connectionFactory.CreateConnection();
+            var channel = connection.CreateModel();
+            channel.BasicQos(0, 10, false);
 
-        channel.BasicConsume(TopologyConstants.OrderQueues.StockEventsQueue, autoAck: false, consumer: consumer);
-        return Task.CompletedTask;
+            var consumer = new AsyncEventingBasicConsumer(channel);
+            consumer.Received += async (_, args) =>
+            {
+                await HandleMessageAsync(channel, args, stoppingToken);
+            };
+
+            channel.BasicConsume(TopologyConstants.OrderQueues.StockEventsQueue, autoAck: false, consumer: consumer);
+            return Task.CompletedTask;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Stock events consumer failed to start for queue {QueueName}.",
+                TopologyConstants.OrderQueues.StockEventsQueue);
+            throw;
+        }
     }
 
     /// <summary>

@@ -3,6 +3,7 @@ using ECommerce.Shared.Messaging.Topology;
 using ECommerce.Core.Persistence;
 using ECommerce.Core.RateLimiting;
 using ECommerce.Core.Redis;
+using ECommerce.Core.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -13,6 +14,8 @@ using Orchestrator.Api.Infrastructure.Consumers;
 using Orchestrator.Api.Infrastructure.Messaging;
 using Orchestrator.Api.Infrastructure.Outbox;
 using Orchestrator.Api.Infrastructure.Persistence;
+using Serilog;
+using LoggingServiceCollectionExtensions = ECommerce.Core.Logging.LoggingServiceCollectionExtensions;
 
 namespace Orchestrator.Api;
 
@@ -28,6 +31,15 @@ public static class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddLogging(builder.Configuration, "orchestrator-api");
+        builder.Host.UseSerilog((context, services, loggerConfiguration) =>
+            LoggingServiceCollectionExtensions.ConfigureSerilog(
+                loggerConfiguration,
+                context.Configuration,
+                context.HostingEnvironment.EnvironmentName,
+                services,
+                "orchestrator-api"));
 
         builder.Services.AddControllers();
         builder.Services.AddDbContext<OrderDbContext>(options =>
@@ -65,10 +77,11 @@ public static class Program
         {
             ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
         });
+        app.UseMiddleware<HttpErrorLoggingMiddleware>();
         app.MapControllers();
 
         var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
-        var logger = loggerFactory.CreateLogger("Stock.Worker");
+        var logger = loggerFactory.CreateLogger("orchestrator-api");
 
         MigrationExtensions.ApplyMigrationsWithRetryAsync<OrderDbContext>(app.Services, logger)
             .GetAwaiter()
