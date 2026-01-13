@@ -1,13 +1,16 @@
 using ECommerce.Messaging.RabbitMq;
 using ECommerce.Core.Persistence;
+using ECommerce.Core.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Hosting;
 using Notification.Worker.Application;
 using Notification.Worker.Application.Abstractions;
 using Notification.Worker.Infrastructure.Consumers;
 using Notification.Worker.Infrastructure.Messaging;
 using Notification.Worker.Infrastructure.Outbox;
 using Notification.Worker.Infrastructure.Persistence;
+using Serilog;
 
 namespace Notification.Worker;
 
@@ -23,6 +26,15 @@ public static class Program
     public static void Main(string[] args)
     {
         var builder = Host.CreateApplicationBuilder(args);
+
+        builder.Services.AddLogging(builder.Configuration, "notification-worker");
+        builder.Host.UseSerilog((context, services, loggerConfiguration) =>
+            LoggingServiceCollectionExtensions.ConfigureSerilog(
+                loggerConfiguration,
+                context.Configuration,
+                context.HostingEnvironment.EnvironmentName,
+                services,
+                "notification-worker"));
 
         builder.Services.AddDbContext<NotificationDbContext>(options =>
             options.UseNpgsql(
@@ -50,18 +62,28 @@ public static class Program
         var host = builder.Build();
 
         var loggerFactory = host.Services.GetRequiredService<ILoggerFactory>();
-        var logger = loggerFactory.CreateLogger("Stock.Worker");
+        var logger = loggerFactory.CreateLogger("notification-worker");
 
-        MigrationExtensions.ApplyMigrationsWithRetryAsync<NotificationDbContext>(host.Services, logger)
-            .GetAwaiter()
-            .GetResult();
+        WorkerExceptionHandlingExtensions.RegisterGlobalExceptionHandlers(logger, "notification-worker");
 
-        using (var scope = host.Services.CreateScope())
+        try
         {
-            var initializer = scope.ServiceProvider.GetRequiredService<ITopologyInitializer>();
-            initializer.Initialize();
-        }
+            MigrationExtensions.ApplyMigrationsWithRetryAsync<NotificationDbContext>(host.Services, logger)
+                .GetAwaiter()
+                .GetResult();
 
-        host.Run();
+            using (var scope = host.Services.CreateScope())
+            {
+                var initializer = scope.ServiceProvider.GetRequiredService<ITopologyInitializer>();
+                initializer.Initialize();
+            }
+
+            host.Run();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Worker notification-worker terminated unexpectedly during startup.");
+            throw;
+        }
     }
 }

@@ -25,6 +25,22 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
   order-service:
     build:
       context: .
@@ -43,10 +59,19 @@ services:
       RateLimiting__Requests: "100"
       RateLimiting__WindowSeconds: "60"
       RateLimiting__KeyPrefix: orchestrator
+      Logging__Elasticsearch__Enabled: "true"
+      Logging__Elasticsearch__Uri: http://elasticsearch:9200
+      Logging__Elasticsearch__IndexPrefix: logs
+      Logging__Elasticsearch__MinimumLevel: Information
+      Logging__Elasticsearch__AutoRegisterTemplate: "true"
+      Logging__Elasticsearch__BatchPostingLimit: "1000"
+      Logging__Elasticsearch__PeriodSeconds: "2"
+      Correlation__HeaderName: X-Correlation-Id
     depends_on:
       - rabbitmq
       - postgres
       - redis
+      - elasticsearch
     ports:
       - "5001:8080"
 
@@ -61,9 +86,18 @@ services:
       RabbitMQ__Pass: guest
       RabbitMQ__VirtualHost: /
       RabbitMQ__ServiceName: stock-service
+      Logging__Elasticsearch__Enabled: "true"
+      Logging__Elasticsearch__Uri: http://elasticsearch:9200
+      Logging__Elasticsearch__IndexPrefix: logs
+      Logging__Elasticsearch__MinimumLevel: Information
+      Logging__Elasticsearch__AutoRegisterTemplate: "true"
+      Logging__Elasticsearch__BatchPostingLimit: "1000"
+      Logging__Elasticsearch__PeriodSeconds: "2"
+      Correlation__HeaderName: X-Correlation-Id
     depends_on:
       - rabbitmq
       - postgres
+      - elasticsearch
 
   notification-service:
     build:
@@ -76,10 +110,20 @@ services:
       RabbitMQ__Pass: guest
       RabbitMQ__VirtualHost: /
       RabbitMQ__ServiceName: notification-service
+      Logging__Elasticsearch__Enabled: "true"
+      Logging__Elasticsearch__Uri: http://elasticsearch:9200
+      Logging__Elasticsearch__IndexPrefix: logs
+      Logging__Elasticsearch__MinimumLevel: Information
+      Logging__Elasticsearch__AutoRegisterTemplate: "true"
+      Logging__Elasticsearch__BatchPostingLimit: "1000"
+      Logging__Elasticsearch__PeriodSeconds: "2"
+      Correlation__HeaderName: X-Correlation-Id
     depends_on:
       - rabbitmq
       - postgres
+      - elasticsearch
 
 volumes:
   postgres-data:
   redis-data:
+  elasticsearch-data:
