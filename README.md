@@ -1,4 +1,6 @@
-# E-Commerce Microservices Solution
+# Commercify Microservices Solution
+
+<img width="512" height="512" alt="Image" src="https://github.com/user-attachments/assets/ce33c1e1-5b71-47dc-8d16-18a3f782fffe" />
 
 This repository contains a .NET 9 microservices sample that models a simple e-commerce flow (order creation → stock reservation → notification). Services communicate asynchronously via RabbitMQ and each service has its own PostgreSQL database.
 
