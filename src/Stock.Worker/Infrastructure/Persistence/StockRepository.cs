@@ -63,13 +63,21 @@ public sealed class StockRepository : IStockRepository
     {
         foreach (var item in items)
         {
-            var affectedRows = await _dbContext.Database.ExecuteSqlInterpolatedAsync(
-                $"UPDATE stock_items SET available_qty = available_qty - {item.Quantity}, reserved_qty = reserved_qty + {item.Quantity}, updated_at_utc = {now}, version = version + 1 WHERE product_id = {item.ProductId} AND available_qty >= {item.Quantity}",
-                cancellationToken);
-
-            if (affectedRows == 0)
+            try
             {
-                return false;
+                var affectedRows = await _dbContext.Database.ExecuteSqlInterpolatedAsync(
+                    $"UPDATE stock_items SET available_qty = available_qty - {item.Quantity}, reserved_qty = reserved_qty + {item.Quantity}, updated_at_utc = {now}, version = version + 1 WHERE product_id = {item.ProductId} AND available_qty >= {item.Quantity}",
+                    cancellationToken);
+
+                if (affectedRows == 0)
+                {
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
             }
         }
 
